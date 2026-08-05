@@ -1,0 +1,11 @@
+{
+	"$schema": "./node_modules/oxfmt/configuration_schema.json",
+	"tabWidth": 2,
+	"useTabs": true,
+	"printWidth": 110,
+	"trailingComma": "all",
+	"semi": false,
+	"singleQuote": true,
+	"sortPackageJson": false,
+	"ignorePatterns": ["node_modules/", "dist/", "run.sql", ".wrangler/"]
+}
