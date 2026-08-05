@@ -5,7 +5,8 @@
 		"dev": "wrangler dev",
 		"deploy": "wrangler deploy --minify",
 		"cf-typegen": "wrangler types --env-interface CloudflareBindings",
-		"format": "oxfmt"
+		"format": "oxfmt",
+		"lint": "oxlint"
 	},
 	"dependencies": {
 		"cheerio": "^1.2.0",
@@ -14,6 +15,7 @@
 	},
 	"devDependencies": {
 		"oxfmt": "^0.62.0",
+		"oxlint": "^1.77.0",
 		"wrangler": "^4.110.0"
 	}
 }

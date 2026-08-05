@@ -7,7 +7,7 @@ const app = new Hono()
 
 app.route('/', api)
 
-app.post('/webhook', async (c) => {
+app.post('/webhook', (c) => {
 	return webhookCallback(bot, 'cloudflare-mod')(c.req.raw)
 })
 

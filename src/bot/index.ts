@@ -1,3 +1,4 @@
+// oxlint-disable typescript/ban-ts-comment
 import { Bot, Context, InlineKeyboard } from 'grammy'
 import { env } from 'cloudflare:workers'
 import { checkLinkIsValidate } from './services/validate'
@@ -86,13 +87,12 @@ bot.callbackQuery('check_joined', async (ctx2) => {
 					parse_mode: 'HTML',
 				},
 			)
-		} else {
-			await ctx2.answerCallbackQuery({
-				text: 'Please join the channel first.',
-				show_alert: true,
-			})
 		}
-	} catch (e) {
+		await ctx2.answerCallbackQuery({
+			text: 'Please join the channel first.',
+			show_alert: true,
+		})
+	} catch {
 		await ctx2.answerCallbackQuery({
 			text: 'Please join the channel first.',
 			show_alert: true,
@@ -112,11 +112,11 @@ async function getInviteLink(ctx2: Context) {
 			member_limit: void 0,
 		})
 		return res.invite_link
-	} catch (e) {
+	} catch {
 		try {
 			const exportRes = await ctx2.api.exportChatInviteLink(channelId)
 			return exportRes
-		} catch (_err) {
+		} catch {
 			return `https://t.me/${String(channelId)}`
 		}
 	}
@@ -138,7 +138,7 @@ bot.on('message', async (ctx2) => {
 				await ctx2.api.editMessageText(ctx2.chat.id, loadingMsg.message_id, `\`\`\`\n ${captionText}\`\`\``, {
 					parse_mode: 'MarkdownV2',
 				})
-			} catch (error) {
+			} catch {
 				await ctx2.api.editMessageText(
 					ctx2.chat.id,
 					loadingMsg.message_id,

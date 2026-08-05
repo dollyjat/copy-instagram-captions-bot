@@ -1,0 +1,38 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"plugins": ["typescript", "import", "unicorn", "promise", "node", "oxc"],
+
+	"categories": {
+		"correctness": "error",
+		"suspicious": "error",
+		"perf": "warn",
+		"pedantic": "warn",
+		"style": "off",
+		"nursery": "warn"
+	},
+	"rules": {
+		"no-console": "off",
+		"no-debugger": "error",
+
+		"eslint/prefer-const": "error",
+		"eslint/no-var": "error",
+
+		"typescript/no-explicit-any": "warn",
+		"typescript/no-non-null-assertion": "warn",
+
+		"import/no-cycle": "error",
+		"import/no-duplicates": "error",
+
+		"unicorn/throw-new-error": "error",
+		"unicorn/prefer-node-protocol": "error",
+
+		"promise/no-return-wrap": "error"
+	},
+
+	"env": {
+		"builtin": true,
+		"node": true,
+		"es2022": true
+	},
+	"ignorePatterns": ["node_modules", "dist", ".wrangler", "coverage"]
+}

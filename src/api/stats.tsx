@@ -8,6 +8,7 @@ interface StatsPageProps {
 	growthRate: number
 }
 
+// oxlint-disable-next-line max-lines-per-function
 export default function StatsPage({
 	users,
 	countUsers,
