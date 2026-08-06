@@ -38,8 +38,7 @@ const startHandler = async (ctx2: Context) => {
 
 bot.command('start', startHandler)
 
-bot.use(async (ctx2, next2) => {
-	if (ctx2.update.callback_query) return next2()
+bot.on('message', async (ctx2, next2) => {
 	const userId = ctx2.from?.id
 	if (!userId) return next2()
 	try {
