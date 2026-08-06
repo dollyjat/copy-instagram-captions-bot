@@ -2,11 +2,9 @@
 import { Bot, Context, InlineKeyboard } from 'grammy'
 import { env } from 'cloudflare:workers'
 import { checkLinkIsValidate } from './services/validate'
-import fetchCaption from './services/api'
-import getCaption from './services/dom'
 import { userDatabase } from '../db/user'
+import { fetchCaptionServerOne, fetchCaptionServerTwo } from './services/api'
 
-const apiToken = env.API_TOKEN
 const channelId = env.CHANNEL_ID
 const users = new userDatabase(env.shuta)
 
@@ -128,12 +126,21 @@ bot.on('message', async (ctx2) => {
 		if (isLink) {
 			const loadingMsg = await ctx2.reply('\u{1F50D} Fetching caption from Instagram...')
 			try {
-				const getcaption = await fetchCaption({
-					token: apiToken,
-					url: message,
-				})
-				const caption = getCaption(getcaption)
-				const captionText = Array.isArray(caption) ? caption.join('\n') : caption.toString()
+				let captionText: string | null
+				captionText = await fetchCaptionServerOne(message)
+				if (!captionText) {
+					await ctx2.api.editMessageText(
+						ctx2.chat.id,
+						loadingMsg.message_id,
+						'\u{1F4BB} Re trying with server 2 ......',
+					)
+				}
+
+				captionText = await fetchCaptionServerTwo(message)
+				if (!captionText) {
+					throw new Error('Failed to fetch caption. Please try again later.')
+				}
+
 				await ctx2.api.editMessageText(ctx2.chat.id, loadingMsg.message_id, `\`\`\`\n ${captionText}\`\`\``, {
 					parse_mode: 'MarkdownV2',
 				})
