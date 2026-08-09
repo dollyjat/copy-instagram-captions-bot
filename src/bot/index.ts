@@ -119,40 +119,41 @@ async function getInviteLink(ctx2: Context) {
 	}
 }
 
-bot.on('message', async (ctx2) => {
-	const message = ctx2.message.text
-	if (message) {
-		const isLink = checkLinkIsValidate(message)
-		if (isLink) {
-			const loadingMsg = await ctx2.reply('\u{1F50D} Fetching caption from Instagram...')
-			try {
-				let captionText: string | null
-				captionText = await fetchCaptionServerOne(message)
-				if (!captionText) {
-					await ctx2.api.editMessageText(
-						ctx2.chat.id,
-						loadingMsg.message_id,
-						'\u{1F4BB} Re trying with server 2 ......',
-					)
-				}
+bot.on('message:text', async (ctx) => {
+	const message = ctx.message.text.trim()
 
-				captionText = await fetchCaptionServerTwo(message)
-				if (!captionText) {
-					throw new Error('Failed to fetch caption. Please try again later.')
-				}
+	if (!checkLinkIsValidate(message)) {
+		await ctx.reply('❌ Invalid Instagram link. Please send a valid Instagram URL.')
+		return
+	}
 
-				await ctx2.api.editMessageText(ctx2.chat.id, loadingMsg.message_id, `\`\`\`\n ${captionText}\`\`\``, {
-					parse_mode: 'MarkdownV2',
-				})
-			} catch {
-				await ctx2.api.editMessageText(
-					ctx2.chat.id,
-					loadingMsg.message_id,
-					'\u274C Failed to fetch caption. Please try again later.',
-				)
-			}
-		} else {
-			return ctx2.reply('Invalid Instagram link')
+	const loadingMsg = await ctx.reply('🔍 Fetching caption from Instagram...\n\n⏳ Please wait...')
+
+	try {
+		let caption = await fetchCaptionServerOne(message)
+
+		if (!caption) {
+			await ctx.api.editMessageText(
+				ctx.chat.id,
+				loadingMsg.message_id,
+				'🔄 Server 1 failed.\n\n⏳ Trying backup server...',
+			)
+
+			caption = await fetchCaptionServerTwo(message)
 		}
+
+		if (!caption) {
+			throw new Error('Caption not found')
+		}
+
+		await ctx.api.editMessageText(ctx.chat.id, loadingMsg.message_id, caption)
+	} catch (error) {
+		console.error('Failed to fetch Instagram caption:', error)
+
+		await ctx.api.editMessageText(
+			ctx.chat.id,
+			loadingMsg.message_id,
+			'❌ Failed to fetch caption.\n\nPlease try again later.',
+		)
 	}
 })

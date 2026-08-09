@@ -5,7 +5,17 @@ interface StatsPageProps {
 	countUsers: number
 	todayUsers: number
 	yesterdayUsers: number
-	growthRate: number
+	growthRate: number | null
+}
+
+const indianDateTimeFormatter = new Intl.DateTimeFormat('en-IN', {
+	dateStyle: 'medium',
+	timeStyle: 'short',
+	timeZone: 'Asia/Kolkata',
+})
+
+function formatIndianDateTime(timestamp: number) {
+	return indianDateTimeFormatter.format(new Date(timestamp))
 }
 
 // oxlint-disable-next-line max-lines-per-function
@@ -47,12 +57,12 @@ export default function StatsPage({
 						</article>
 
 						<article>
-							<h5>🆕 Joined Today</h5>
+							<h5>🆕 Joined Today (IST)</h5>
 							<h2>{todayUsers}</h2>
 						</article>
 
 						<article>
-							<h5>📅 Joined Yesterday</h5>
+							<h5>📅 Joined Yesterday (IST)</h5>
 							<h2>{yesterdayUsers}</h2>
 						</article>
 
@@ -62,15 +72,16 @@ export default function StatsPage({
 							<h2
 								style={{
 									color:
-										growthRate > 0
-											? 'var(--pico-color-green-500)'
-											: growthRate < 0
-												? 'var(--pico-color-red-500)'
-												: 'inherit',
+										growthRate === null
+											? 'inherit'
+											: growthRate > 0
+												? 'var(--pico-color-green-500)'
+												: growthRate < 0
+													? 'var(--pico-color-red-500)'
+													: 'inherit',
 								}}
 							>
-								{growthRate > 0 && '+'}
-								{growthRate.toFixed(1)}%
+								{growthRate === null ? 'New' : `${growthRate > 0 ? '+' : ''}${growthRate.toFixed(1)}%`}
 							</h2>
 						</article>
 					</section>
@@ -87,7 +98,7 @@ export default function StatsPage({
 										<th>ID</th>
 										<th>Name</th>
 										<th>Username</th>
-										<th>Joined</th>
+										<th>Joined (IST)</th>
 									</tr>
 								</thead>
 
@@ -107,7 +118,7 @@ export default function StatsPage({
 
 												<td>{user.username ? <code>@{user.username}</code> : '-'}</td>
 
-												<td>{new Date(user.joined_at).toLocaleString()}</td>
+												<td>{formatIndianDateTime(user.joined_at)}</td>
 											</tr>
 										))
 									)}

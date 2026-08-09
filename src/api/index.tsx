@@ -6,6 +6,14 @@ import StatsPage from './stats'
 const app = new Hono()
 const users = new userDatabase(env.shuta)
 
+function calculateGrowthRate(todayUsers: number, yesterdayUsers: number) {
+	if (yesterdayUsers === 0) {
+		return todayUsers === 0 ? 0 : null
+	}
+
+	return ((todayUsers - yesterdayUsers) / yesterdayUsers) * 100
+}
+
 app.get('/', (c) => c.json(JSON.parse(env.BOT_INFO)))
 
 app.get('/stats', async (c) => {
@@ -19,7 +27,7 @@ app.get('/stats', async (c) => {
 			countUsers={countUsers}
 			todayUsers={todayUsers}
 			yesterdayUsers={yesterdayUsers}
-			growthRate={((todayUsers - yesterdayUsers) / yesterdayUsers) * 100}
+			growthRate={calculateGrowthRate(todayUsers, yesterdayUsers)}
 		/>,
 	)
 })
@@ -34,7 +42,7 @@ app.get('/api/stats', async (c) => {
 		countUsers,
 		todayUsers,
 		yesterdayUsers,
-		growthRate: ((todayUsers - yesterdayUsers) / yesterdayUsers) * 100,
+		growthRate: calculateGrowthRate(todayUsers, yesterdayUsers),
 	})
 })
 

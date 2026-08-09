@@ -6,6 +6,19 @@ export interface User {
 }
 
 const tableName = 'users_caption_bot'
+const dayInMilliseconds = 24 * 60 * 60 * 1000
+const indiaOffsetInMilliseconds = 5.5 * 60 * 60 * 1000
+
+function getIndiaDayRange(dayOffset = 0, now = Date.now()) {
+	const indiaNow = now + indiaOffsetInMilliseconds
+	const indiaDayStart =
+		Math.floor(indiaNow / dayInMilliseconds) * dayInMilliseconds + dayOffset * dayInMilliseconds
+
+	return {
+		start: indiaDayStart - indiaOffsetInMilliseconds,
+		end: indiaDayStart - indiaOffsetInMilliseconds + dayInMilliseconds,
+	}
+}
 
 export class userDatabase {
 	constructor(private readonly db: D1Database) {}
@@ -104,6 +117,7 @@ export class userDatabase {
 	}
 
 	async todayCount() {
+		const { start, end } = getIndiaDayRange()
 		const row = await this.db
 			.prepare(
 				`
@@ -113,13 +127,14 @@ export class userDatabase {
         AND joined_at < ?
       `,
 			)
-			.bind(Date.now() - 24 * 60 * 60 * 1000, Date.now())
+			.bind(start, end)
 			.first<{ total: number }>()
 
 		return row?.total ?? 0
 	}
 
 	async yesterdayCount() {
+		const { start, end } = getIndiaDayRange(-1)
 		const row = await this.db
 			.prepare(
 				`
@@ -129,7 +144,7 @@ export class userDatabase {
         AND joined_at < ?
       `,
 			)
-			.bind(Date.now() - 48 * 60 * 60 * 1000, Date.now() - 24 * 60 * 60 * 1000)
+			.bind(start, end)
 			.first<{ total: number }>()
 
 		return row?.total ?? 0
