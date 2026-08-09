@@ -147,13 +147,19 @@ bot.on('message:text', async (ctx) => {
 		}
 
 		await ctx.api.editMessageText(ctx.chat.id, loadingMsg.message_id, caption)
-	} catch (error) {
-		console.error('Failed to fetch Instagram caption:', error)
-
+	} catch {
 		await ctx.api.editMessageText(
 			ctx.chat.id,
 			loadingMsg.message_id,
-			'❌ Failed to fetch caption.\n\nPlease try again later.',
+			[
+				'❌ <b>Unable to fetch the caption</b>',
+				'',
+				'🔄 Please try again in a few moments.',
+				'',
+				'🛠️ If the problem continues, contact support:',
+				'👤 @DevGauravJatt',
+			].join('\n'),
+			{ parse_mode: 'HTML' },
 		)
 	}
 })
